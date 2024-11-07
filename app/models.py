@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing_extensions import Optional
 
 class Topic(BaseModel):
-    userId: Optional[str]
+    topicId: Optional[str]
+    userId: str
     prompt: str
