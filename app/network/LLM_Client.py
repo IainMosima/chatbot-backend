@@ -44,40 +44,34 @@ class LLMClient:
         pass
 
 
-    async def chat_without_topic(self, topic_data, db):
-        llm_result = self.http_client.post(
+    async def chat_without_topic(self, topic_data:CreateTopic, db):
+        llm_result_call = await self.http_client.post(
             endpoint="/get",
-            response_model=LLMResponse,
-            json={"msg": topic_data.prompt},
+            json={"msg": topic_data["prompt"]},
         )
+        llm_result = llm_result_call.dict()["data"]
+        chat_history = llm_result["chat_history"]
+
+
+
 
         new_topic = CreateTopic(
-            userId=topic_data.userId,
-            prompt=topic_data.prompt,
-            chat_history= llm_result["chat_history"]
-        )
+            userId=topic_data["userId"],
+            prompt=topic_data["prompt"],
+            chat_history= chat_history
+        ).dict()
 
-        await db["topics"].insert_one(new_topic)
+        saved_topic = await db["topics"].insert_one(new_topic)
+
+        print("*****Saved Topic*****")
+        print(saved_topic)
 
         result = FinalResponse(
-            userId=topic_data.userId,
+            userId=topic_data["userId"],
             answer=llm_result["answer"],
             chat_history=llm_result["chat_history"],
             topic=llm_result["topic"],
+            topicId=str(saved_topic.inserted_id)
         )
 
         return result
-
-
-
-
-        return result
-
-
-
-
-
-
-
-
-

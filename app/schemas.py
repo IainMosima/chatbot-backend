@@ -4,10 +4,9 @@ from pydantic import BaseModel
 
 
 class CreateTopic(BaseModel):
-    userId: str
+    userId: Optional[str]
     prompt: str
-    chat_history: list[str]
-    topicId: Optional[str]
+    chat_history: Optional[list[str]]
 
 class LLMResponse(BaseModel):
     answer: str
@@ -16,3 +15,4 @@ class LLMResponse(BaseModel):
 
 class FinalResponse(LLMResponse):
     userId: str
+    topicId: str
