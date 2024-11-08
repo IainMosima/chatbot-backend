@@ -1,16 +1,19 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from fastapi import FastAPI
+import os
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
-client = AsyncIOMotorClient(MONGO_URI)
-
-db = client[os.getenv("DATABASE_NAME")]
 
 async def connect_to_db():
-    await client.wait_until_ready()
+    client = AsyncIOMotorClient(MONGO_URI)
+    return client
 
 async def get_db():
-    return db
+    client = AsyncIOMotorClient(MONGO_URI)
+    db = client[os.getenv("DATABASE_NAME")]
+    try:
+        yield db
+    finally:
+        await client.close()
